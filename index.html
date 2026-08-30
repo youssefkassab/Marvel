@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <title>Marvel Cinematic Universe & Legacy Multiverse Watchlist</title>
   <style>
     :root {
@@ -214,6 +215,70 @@
       transition: width 0.3s ease;
     }
 
+    /* Mode & Backup Row */
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .toggle-group {
+      display: flex;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn.active {
+      background: rgba(230, 36, 41, 0.25);
+      color: #fff;
+      border: 1px solid var(--marvel-red);
+    }
+
+    .backup-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
     /* Controls */
     .controls {
       display: flex;
@@ -388,7 +453,7 @@
       color: #fff;
     }
 
-    /* Requirement Tags */
+    /* Requirement Tags / Interactive Deep-links */
     .req-tag {
       font-size: 0.72rem;
       font-weight: 800;
@@ -399,7 +464,14 @@
       gap: 5px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
       animation: pulseGlow 2.5s infinite;
+    }
+
+    .req-tag:hover {
+      transform: scale(1.05);
     }
 
     @keyframes pulseGlow {
@@ -463,6 +535,10 @@
         justify-content: space-between;
         padding-left: 36px;
       }
+      .toolbar-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -473,18 +549,18 @@
     <header>
       <div class="marvel-badge">Marvel Cinematic Multiverse</div>
       <h1>Ultimate Master Watchlist</h1>
-      <p class="subtitle">Complete timeline with legacy multiverse universes, prerequisite requirement warnings, and essential storyline bookmarks.</p>
+      <p class="subtitle">Complete timeline with legacy multiverse universes, interactive requirement jumps, chronological sorting, and progress backup.</p>
     </header>
 
     <!-- Universe Tab Switcher -->
     <div class="universe-tabs">
-      <button class="tab-btn active" onclick="switchUniverse('mcu', this)">
+      <button id="tab-btn-mcu" class="tab-btn active" onclick="switchUniverse('mcu')">
         <span>🎬</span> MCU Sacred Timeline
       </button>
-      <button class="tab-btn tab-spider" onclick="switchUniverse('spiderman', this)">
+      <button id="tab-btn-spiderman" class="tab-btn tab-spider" onclick="switchUniverse('spiderman')">
         <span>🕷️</span> Spider-Man Multiverse (Sony)
       </button>
-      <button class="tab-btn tab-xmen" onclick="switchUniverse('xmen', this)">
+      <button id="tab-btn-xmen" class="tab-btn tab-xmen" onclick="switchUniverse('xmen')">
         <span>🧬</span> X-Men Universe (Fox)
       </button>
     </div>
@@ -497,8 +573,8 @@
       
       <div class="legend-row">
         <div class="legend-item"><span class="star-icon">⭐</span> <strong>Gold Star:</strong> Essential Core Arc Title (Iron Man, Avengers, Loki, Major Events)</div>
-        <div class="legend-item"><span class="req-tag req-spider">⚠️ Watch Spider-Man Universe First</span> Prerequisite for Multiverse crossovers</div>
-        <div class="legend-item"><span class="req-tag req-xmen">⚠️ Watch X-Men Universe First</span> Prerequisite for Mutant crossovers</div>
+        <div class="legend-item"><span class="req-tag req-spider">🕷️ Watch Spider-Man Universe First</span> Clickable prerequisite jump</div>
+        <div class="legend-item"><span class="req-tag req-xmen">🧬 Watch X-Men Universe First</span> Clickable prerequisite jump</div>
       </div>
     </div>
 
@@ -513,13 +589,27 @@
       </div>
     </div>
 
-    <!-- Controls -->
+    <!-- Toolbar: Ordering Mode & Backup Tools -->
+    <div class="toolbar-row">
+      <div class="toggle-group">
+        <button id="order-release-btn" class="toggle-btn active" onclick="setOrderMode('release')">📅 Release Order</button>
+        <button id="order-chrono-btn" class="toggle-btn" onclick="setOrderMode('chrono')">⏳ Chronological Storyline Order</button>
+      </div>
+
+      <div class="backup-group">
+        <button class="action-btn" onclick="exportData()">💾 Export Backup</button>
+        <button class="action-btn" onclick="document.getElementById('importFileInput').click()">📂 Import Backup</button>
+        <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importData(event)" />
+      </div>
+    </div>
+
+    <!-- Search & Filters -->
     <div class="controls">
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="Search titles, characters, phases, or years..." oninput="filterItems()" />
       </div>
       <div class="filter-buttons" id="filter-buttons-container">
-        <!-- Rendered dynamically depending on Universe -->
+        <!-- Rendered dynamically -->
       </div>
     </div>
 
@@ -535,126 +625,126 @@
           phase: "Phase 1: The Infinity Saga Begins (2008–2012)",
           emoji: "🌀",
           items: [
-            { id: "mcu-01", num: "01", title: "Iron Man", date: "May 2, 2008", type: "movie", star: true },
-            { id: "mcu-02", num: "02", title: "The Incredible Hulk", date: "June 13, 2008", type: "movie", star: true },
-            { id: "mcu-03", num: "03", title: "Iron Man 2", date: "May 7, 2010", type: "movie", star: true },
-            { id: "mcu-04", num: "04", title: "Thor", date: "May 6, 2011", type: "movie", star: true },
-            { id: "mcu-05", num: "05", title: "Captain America: The First Avenger", date: "July 22, 2011", type: "movie", star: true },
-            { id: "mcu-06", num: "06", title: "Marvel One-Shot: The Consultant", date: "September 13, 2011", type: "oneshot", star: false },
-            { id: "mcu-07", num: "07", title: "Marvel One-Shot: A Funny Thing Happened...", date: "October 25, 2011", type: "oneshot", star: false },
-            { id: "mcu-08", num: "08", title: "The Avengers", date: "May 4, 2012", type: "movie", star: true },
-            { id: "mcu-09", num: "09", title: "Marvel One-Shot: Item 47", date: "September 25, 2012", type: "oneshot", star: false }
+            { id: "mcu-01", num: "01", chronoRank: 3, title: "Iron Man", date: "May 2, 2008", type: "movie", star: true },
+            { id: "mcu-02", num: "02", chronoRank: 5, title: "The Incredible Hulk", date: "June 13, 2008", type: "movie", star: true },
+            { id: "mcu-03", num: "03", chronoRank: 4, title: "Iron Man 2", date: "May 7, 2010", type: "movie", star: true },
+            { id: "mcu-04", num: "04", chronoRank: 6, title: "Thor", date: "May 6, 2011", type: "movie", star: true },
+            { id: "mcu-05", num: "05", chronoRank: 1, title: "Captain America: The First Avenger", date: "July 22, 2011", type: "movie", star: true },
+            { id: "mcu-06", num: "06", chronoRank: 7, title: "Marvel One-Shot: The Consultant", date: "September 13, 2011", type: "oneshot", star: false },
+            { id: "mcu-07", num: "07", chronoRank: 8, title: "Marvel One-Shot: A Funny Thing Happened...", date: "October 25, 2011", type: "oneshot", star: false },
+            { id: "mcu-08", num: "08", chronoRank: 9, title: "The Avengers", date: "May 4, 2012", type: "movie", star: true },
+            { id: "mcu-09", num: "09", chronoRank: 10, title: "Marvel One-Shot: Item 47", date: "September 25, 2012", type: "oneshot", star: false }
           ]
         },
         {
           phase: "Phase 2: Expanding the Universe (2013–2015)",
           emoji: "⚙️",
           items: [
-            { id: "mcu-10", num: "10", title: "Iron Man 3", date: "May 3, 2013", type: "movie", star: true },
-            { id: "mcu-11", num: "11", title: "Marvel One-Shot: Agent Carter", date: "September 3, 2013", type: "oneshot", star: false },
-            { id: "mcu-12", num: "12", title: "Agents of S.H.I.E.L.D. (Season 1)", date: "September 24, 2013", type: "tv", star: false },
-            { id: "mcu-13", num: "13", title: "Thor: The Dark World", date: "November 8, 2013", type: "movie", star: false },
-            { id: "mcu-14", num: "14", title: "Marvel One-Shot: All Hail the King", date: "February 4, 2014", type: "oneshot", star: true },
-            { id: "mcu-15", num: "15", title: "Captain America: The Winter Soldier", date: "April 4, 2014", type: "movie", star: true },
-            { id: "mcu-16", num: "16", title: "Guardians of the Galaxy", date: "August 1, 2014", type: "movie", star: true },
-            { id: "mcu-17", num: "17", title: "Agents of S.H.I.E.L.D. (Season 2)", date: "September 23, 2014", type: "tv", star: false },
-            { id: "mcu-18", num: "18", title: "Agent Carter (Season 1)", date: "January 6, 2015", type: "tv", star: false },
-            { id: "mcu-19", num: "19", title: "Daredevil (Season 1)", date: "April 10, 2015", type: "tv", star: true },
-            { id: "mcu-20", num: "20", title: "Avengers: Age of Ultron", date: "May 1, 2015", type: "movie", star: true },
-            { id: "mcu-21", num: "21", title: "Ant-Man", date: "July 17, 2015", type: "movie", star: true }
+            { id: "mcu-10", num: "10", chronoRank: 11, title: "Iron Man 3", date: "May 3, 2013", type: "movie", star: true },
+            { id: "mcu-11", num: "11", chronoRank: 2, title: "Marvel One-Shot: Agent Carter", date: "September 3, 2013", type: "oneshot", star: false },
+            { id: "mcu-12", num: "12", chronoRank: 12, title: "Agents of S.H.I.E.L.D. (Season 1)", date: "September 24, 2013", type: "tv", star: false },
+            { id: "mcu-13", num: "13", chronoRank: 13, title: "Thor: The Dark World", date: "November 8, 2013", type: "movie", star: false },
+            { id: "mcu-14", num: "14", chronoRank: 14, title: "Marvel One-Shot: All Hail the King", date: "February 4, 2014", type: "oneshot", star: true },
+            { id: "mcu-15", num: "15", chronoRank: 15, title: "Captain America: The Winter Soldier", date: "April 4, 2014", type: "movie", star: true },
+            { id: "mcu-16", num: "16", chronoRank: 16, title: "Guardians of the Galaxy", date: "August 1, 2014", type: "movie", star: true },
+            { id: "mcu-17", num: "17", chronoRank: 18, title: "Agents of S.H.I.E.L.D. (Season 2)", date: "September 23, 2014", type: "tv", star: false },
+            { id: "mcu-18", num: "18", chronoRank: 2.5, title: "Agent Carter (Season 1)", date: "January 6, 2015", type: "tv", star: false },
+            { id: "mcu-19", num: "19", chronoRank: 19, title: "Daredevil (Season 1)", date: "April 10, 2015", type: "tv", star: true },
+            { id: "mcu-20", num: "20", chronoRank: 20, title: "Avengers: Age of Ultron", date: "May 1, 2015", type: "movie", star: true },
+            { id: "mcu-21", num: "21", chronoRank: 21, title: "Ant-Man", date: "July 17, 2015", type: "movie", star: true }
           ]
         },
         {
           phase: "Phase 3: The Infinity Climax (2015–2019)",
           emoji: "💥",
           items: [
-            { id: "mcu-22", num: "22", title: "Agents of S.H.I.E.L.D. (Season 3)", date: "September 29, 2015", type: "tv", star: false },
-            { id: "mcu-23", num: "23", title: "Jessica Jones (Season 1)", date: "November 20, 2015", type: "tv", star: false },
-            { id: "mcu-24", num: "24", title: "Agent Carter (Season 2)", date: "January 19, 2016", type: "tv", star: false },
-            { id: "mcu-25", num: "25", title: "Daredevil (Season 2)", date: "March 18, 2016", type: "tv", star: false },
-            { id: "mcu-26", num: "26", title: "Captain America: Civil War", date: "May 6, 2016", type: "movie", star: true },
-            { id: "mcu-27", num: "27", title: "Agents of S.H.I.E.L.D. (Season 4)", date: "September 20, 2016", type: "tv", star: false },
-            { id: "mcu-28", num: "28", title: "Luke Cage (Season 1)", date: "September 30, 2016", type: "tv", star: false },
-            { id: "mcu-29", num: "29", title: "Doctor Strange", date: "November 4, 2016", type: "movie", star: true },
-            { id: "mcu-30", num: "30", title: "Iron Fist (Season 1)", date: "March 17, 2017", type: "tv", star: false },
-            { id: "mcu-31", num: "31", title: "Guardians of the Galaxy Vol. 2", date: "May 5, 2017", type: "movie", star: true },
-            { id: "mcu-32", num: "32", title: "Spider-Man: Homecoming", date: "July 7, 2017", type: "movie", star: true },
-            { id: "mcu-33", num: "33", title: "The Defenders", date: "August 18, 2017", type: "tv", star: false },
-            { id: "mcu-34", num: "34", title: "Thor: Ragnarok", date: "November 3, 2017", type: "movie", star: true },
-            { id: "mcu-35", num: "35", title: "The Punisher (Season 1)", date: "November 17, 2017", type: "tv", star: false },
-            { id: "mcu-36", num: "36", title: "Runaways (Season 1)", date: "November 21, 2017", type: "tv", star: false },
-            { id: "mcu-37", num: "37", title: "Black Panther", date: "February 16, 2018", type: "movie", star: true },
-            { id: "mcu-38", num: "38", title: "Jessica Jones (Season 2)", date: "March 8, 2018", type: "tv", star: false },
-            { id: "mcu-39", num: "39", title: "Avengers: Infinity War", date: "April 27, 2018", type: "movie", star: true },
-            { id: "mcu-40", num: "40", title: "Cloak & Dagger (Season 1)", date: "June 7, 2018", type: "tv", star: false },
-            { id: "mcu-41", num: "41", title: "Luke Cage (Season 2)", date: "June 22, 2018", type: "tv", star: false },
-            { id: "mcu-42", num: "42", title: "Ant-Man and the Wasp", date: "July 6, 2018", type: "movie", star: true },
-            { id: "mcu-43", num: "43", title: "Iron Fist (Season 2)", date: "September 7, 2018", type: "tv", star: false },
-            { id: "mcu-44", num: "44", title: "Daredevil (Season 3)", date: "October 19, 2018", type: "tv", star: true },
-            { id: "mcu-45", num: "45", title: "The Punisher (Season 2)", date: "January 18, 2019", type: "tv", star: false },
-            { id: "mcu-46", num: "46", title: "Captain Marvel", date: "March 8, 2019", type: "movie", star: true },
-            { id: "mcu-47", num: "47", title: "Avengers: Endgame", date: "April 26, 2019", type: "movie", star: true },
-            { id: "mcu-48", num: "48", title: "Spider-Man: Far From Home", date: "July 2, 2019", type: "movie", star: true }
+            { id: "mcu-22", num: "22", chronoRank: 22, title: "Agents of S.H.I.E.L.D. (Season 3)", date: "September 29, 2015", type: "tv", star: false },
+            { id: "mcu-23", num: "23", chronoRank: 23, title: "Jessica Jones (Season 1)", date: "November 20, 2015", type: "tv", star: false },
+            { id: "mcu-24", num: "24", chronoRank: 2.6, title: "Agent Carter (Season 2)", date: "January 19, 2016", type: "tv", star: false },
+            { id: "mcu-25", num: "25", chronoRank: 24, title: "Daredevil (Season 2)", date: "March 18, 2016", type: "tv", star: false },
+            { id: "mcu-26", num: "26", chronoRank: 25, title: "Captain America: Civil War", date: "May 6, 2016", type: "movie", star: true },
+            { id: "mcu-27", num: "27", chronoRank: 29, title: "Agents of S.H.I.E.L.D. (Season 4)", date: "September 20, 2016", type: "tv", star: false },
+            { id: "mcu-28", num: "28", chronoRank: 26, title: "Luke Cage (Season 1)", date: "September 30, 2016", type: "tv", star: false },
+            { id: "mcu-29", num: "29", chronoRank: 30, title: "Doctor Strange", date: "November 4, 2016", type: "movie", star: true },
+            { id: "mcu-30", num: "30", chronoRank: 27, title: "Iron Fist (Season 1)", date: "March 17, 2017", type: "tv", star: false },
+            { id: "mcu-31", num: "31", chronoRank: 17, title: "Guardians of the Galaxy Vol. 2", date: "May 5, 2017", type: "movie", star: true },
+            { id: "mcu-32", num: "32", chronoRank: 28, title: "Spider-Man: Homecoming", date: "July 7, 2017", type: "movie", star: true },
+            { id: "mcu-33", num: "33", chronoRank: 31, title: "The Defenders", date: "August 18, 2017", type: "tv", star: false },
+            { id: "mcu-34", num: "34", chronoRank: 33, title: "Thor: Ragnarok", date: "November 3, 2017", type: "movie", star: true },
+            { id: "mcu-35", num: "35", chronoRank: 32, title: "The Punisher (Season 1)", date: "November 17, 2017", type: "tv", star: false },
+            { id: "mcu-36", num: "36", chronoRank: 34, title: "Runaways (Season 1)", date: "November 21, 2017", type: "tv", star: false },
+            { id: "mcu-37", num: "37", chronoRank: 28.5, title: "Black Panther", date: "February 16, 2018", type: "movie", star: true },
+            { id: "mcu-38", num: "38", chronoRank: 35, title: "Jessica Jones (Season 2)", date: "March 8, 2018", type: "tv", star: false },
+            { id: "mcu-39", num: "39", chronoRank: 38, title: "Avengers: Infinity War", date: "April 27, 2018", type: "movie", star: true },
+            { id: "mcu-40", num: "40", chronoRank: 36, title: "Cloak & Dagger (Season 1)", date: "June 7, 2018", type: "tv", star: false },
+            { id: "mcu-41", num: "41", chronoRank: 37, title: "Luke Cage (Season 2)", date: "June 22, 2018", type: "tv", star: false },
+            { id: "mcu-42", num: "42", chronoRank: 39, title: "Ant-Man and the Wasp", date: "July 6, 2018", type: "movie", star: true },
+            { id: "mcu-43", num: "43", chronoRank: 40, title: "Iron Fist (Season 2)", date: "September 7, 2018", type: "tv", star: false },
+            { id: "mcu-44", num: "44", chronoRank: 41, title: "Daredevil (Season 3)", date: "October 19, 2018", type: "tv", star: true },
+            { id: "mcu-45", num: "45", chronoRank: 42, title: "The Punisher (Season 2)", date: "January 18, 2019", type: "tv", star: false },
+            { id: "mcu-46", num: "46", chronoRank: 2.8, title: "Captain Marvel", date: "March 8, 2019", type: "movie", star: true },
+            { id: "mcu-47", num: "47", chronoRank: 43, title: "Avengers: Endgame", date: "April 26, 2019", type: "movie", star: true },
+            { id: "mcu-48", num: "48", chronoRank: 46, title: "Spider-Man: Far From Home", date: "July 2, 2019", type: "movie", star: true }
           ]
         },
         {
           phase: "Phase 4: The Multiverse Saga Begins (2021–2022)",
           emoji: "🌌",
           items: [
-            { id: "mcu-49", num: "49", title: "WandaVision", date: "January 15, 2021", type: "series", star: true },
-            { id: "mcu-50", num: "50", title: "The Falcon and the Winter Soldier", date: "March 19, 2021", type: "series", star: false },
-            { id: "mcu-51", num: "51", title: "Loki (Season 1)", date: "June 9, 2021", type: "series", star: true },
-            { id: "mcu-52", num: "52", title: "Black Widow", date: "July 9, 2021", type: "movie", star: true },
-            { id: "mcu-53", num: "53", title: "What If...? (Season 1)", date: "August 11, 2021", type: "animated", star: false },
-            { id: "mcu-54", num: "54", title: "Shang-Chi and the Legend of the Ten Rings", date: "September 3, 2021", type: "movie", star: true },
-            { id: "mcu-55", num: "55", title: "Eternals", date: "November 5, 2021", type: "movie", star: false },
-            { id: "mcu-56", num: "56", title: "Hawkeye", date: "November 24, 2021", type: "series", star: false },
-            { id: "mcu-57", num: "57", title: "Spider-Man: No Way Home", date: "December 17, 2021", type: "movie", star: true, req: "spider", reqText: "Finish Spider-Man 1-3 & Amazing 1-2 First" },
-            { id: "mcu-58", num: "58", title: "Moon Knight", date: "March 30, 2022", type: "series", star: false },
-            { id: "mcu-59", num: "59", title: "Doctor Strange in the Multiverse of Madness", date: "May 6, 2022", type: "movie", star: true, req: "xmen", reqText: "Watch X-Men Legacy Universe First" },
-            { id: "mcu-60", num: "60", title: "Ms. Marvel", date: "June 8, 2022", type: "series", star: false },
-            { id: "mcu-61", num: "61", title: "Thor: Love and Thunder", date: "July 8, 2022", type: "movie", star: true },
-            { id: "mcu-62", num: "62", title: "I Am Groot (Season 1)", date: "August 10, 2022", type: "animated", star: false },
-            { id: "mcu-63", num: "63", title: "She-Hulk: Attorney at Law", date: "August 18, 2022", type: "series", star: false },
-            { id: "mcu-64", num: "64", title: "Werewolf by Night", date: "October 7, 2022", type: "special", star: false },
-            { id: "mcu-65", num: "65", title: "Black Panther: Wakanda Forever", date: "November 11, 2022", type: "movie", star: true },
-            { id: "mcu-66", num: "66", title: "The Guardians of the Galaxy Holiday Special", date: "November 25, 2022", type: "special", star: false }
+            { id: "mcu-49", num: "49", chronoRank: 45, title: "WandaVision", date: "January 15, 2021", type: "series", star: true },
+            { id: "mcu-50", num: "50", chronoRank: 47, title: "The Falcon and the Winter Soldier", date: "March 19, 2021", type: "series", star: false },
+            { id: "mcu-51", num: "51", chronoRank: 44, title: "Loki (Season 1)", date: "June 9, 2021", type: "series", star: true },
+            { id: "mcu-52", num: "52", chronoRank: 28.2, title: "Black Widow", date: "July 9, 2021", type: "movie", star: true },
+            { id: "mcu-53", num: "53", chronoRank: 44.5, title: "What If...? (Season 1)", date: "August 11, 2021", type: "animated", star: false },
+            { id: "mcu-54", num: "54", chronoRank: 48, title: "Shang-Chi and the Legend of the Ten Rings", date: "September 3, 2021", type: "movie", star: true },
+            { id: "mcu-55", num: "55", chronoRank: 49, title: "Eternals", date: "November 5, 2021", type: "movie", star: false },
+            { id: "mcu-56", num: "56", chronoRank: 51, title: "Hawkeye", date: "November 24, 2021", type: "series", star: false },
+            { id: "mcu-57", num: "57", chronoRank: 50, title: "Spider-Man: No Way Home", date: "December 17, 2021", type: "movie", star: true, req: "spiderman", reqText: "Finish Spider-Man 1-3 & Amazing 1-2 First" },
+            { id: "mcu-58", num: "58", chronoRank: 53, title: "Moon Knight", date: "March 30, 2022", type: "series", star: false },
+            { id: "mcu-59", num: "59", chronoRank: 52, title: "Doctor Strange in the Multiverse of Madness", date: "May 6, 2022", type: "movie", star: true, req: "xmen", reqText: "Watch X-Men Legacy Universe First" },
+            { id: "mcu-60", num: "60", chronoRank: 54, title: "Ms. Marvel", date: "June 8, 2022", type: "series", star: false },
+            { id: "mcu-61", num: "61", chronoRank: 55, title: "Thor: Love and Thunder", date: "July 8, 2022", type: "movie", star: true },
+            { id: "mcu-62", num: "62", chronoRank: 17.5, title: "I Am Groot (Season 1)", date: "August 10, 2022", type: "animated", star: false },
+            { id: "mcu-63", num: "63", chronoRank: 56, title: "She-Hulk: Attorney at Law", date: "August 18, 2022", type: "series", star: false },
+            { id: "mcu-64", num: "64", chronoRank: 57, title: "Werewolf by Night", date: "October 7, 2022", type: "special", star: false },
+            { id: "mcu-65", num: "65", chronoRank: 58, title: "Black Panther: Wakanda Forever", date: "November 11, 2022", type: "movie", star: true },
+            { id: "mcu-66", num: "66", chronoRank: 59, title: "The Guardians of the Galaxy Holiday Special", date: "November 25, 2022", type: "special", star: false }
           ]
         },
         {
           phase: "Phase 5: Expanding the Multiverse (2023–2025)",
           emoji: "🚀",
           items: [
-            { id: "mcu-67", num: "67", title: "Ant-Man and the Wasp: Quantumania", date: "February 17, 2023", type: "movie", star: true },
-            { id: "mcu-68", num: "68", title: "Guardians of the Galaxy Vol. 3", date: "May 5, 2023", type: "movie", star: true },
-            { id: "mcu-69", num: "69", title: "Secret Invasion", date: "June 21, 2023", type: "series", star: false },
-            { id: "mcu-70", num: "70", title: "I Am Groot (Season 2)", date: "September 6, 2023", type: "animated", star: false },
-            { id: "mcu-71", num: "71", title: "Loki (Season 2)", date: "October 5, 2023", type: "series", star: true },
-            { id: "mcu-72", num: "72", title: "The Marvels", date: "November 10, 2023", type: "movie", star: false, req: "xmen", reqText: "Contains X-Men Universe Tease" },
-            { id: "mcu-73", num: "73", title: "What If...? (Season 2)", date: "December 22, 2023", type: "animated", star: false },
-            { id: "mcu-74", num: "74", title: "Echo", date: "January 9, 2024", type: "series", star: false },
-            { id: "mcu-75", num: "75", title: "Deadpool & Wolverine", date: "July 26, 2024", type: "movie", star: true, req: "xmen", reqText: "Finish Fox X-Men & Wolverine Saga First" },
-            { id: "mcu-76", num: "76", title: "Agatha All Along", date: "September 18, 2024", type: "series", star: false },
-            { id: "mcu-77", num: "77", title: "What If...? (Season 3)", date: "December 22, 2024", type: "animated", star: false },
-            { id: "mcu-78", num: "78", title: "Your Friendly Neighborhood Spider-Man (Season 1)", date: "January 29, 2025", type: "animated", star: false },
-            { id: "mcu-79", num: "79", title: "Captain America: Brave New World", date: "February 14, 2025", type: "movie", star: true },
-            { id: "mcu-80", num: "80", title: "Daredevil: Born Again (Season 1)", date: "March 4, 2025", type: "series", star: true },
-            { id: "mcu-81", num: "81", title: "Thunderbolts*", date: "May 2, 2025", type: "movie", star: true },
-            { id: "mcu-82", num: "82", title: "Ironheart", date: "June 24, 2025", type: "series", star: false }
+            { id: "mcu-67", num: "67", chronoRank: 60, title: "Ant-Man and the Wasp: Quantumania", date: "February 17, 2023", type: "movie", star: true },
+            { id: "mcu-68", num: "68", chronoRank: 61, title: "Guardians of the Galaxy Vol. 3", date: "May 5, 2023", type: "movie", star: true },
+            { id: "mcu-69", num: "69", chronoRank: 62, title: "Secret Invasion", date: "June 21, 2023", type: "series", star: false },
+            { id: "mcu-70", num: "70", chronoRank: 17.6, title: "I Am Groot (Season 2)", date: "September 6, 2023", type: "animated", star: false },
+            { id: "mcu-71", num: "71", chronoRank: 63, title: "Loki (Season 2)", date: "October 5, 2023", type: "series", star: true },
+            { id: "mcu-72", num: "72", chronoRank: 64, title: "The Marvels", date: "November 10, 2023", type: "movie", star: false, req: "xmen", reqText: "Contains X-Men Universe Tease" },
+            { id: "mcu-73", num: "73", chronoRank: 64.5, title: "What If...? (Season 2)", date: "December 22, 2023", type: "animated", star: false },
+            { id: "mcu-74", num: "74", chronoRank: 65, title: "Echo", date: "January 9, 2024", type: "series", star: false },
+            { id: "mcu-75", num: "75", chronoRank: 66, title: "Deadpool & Wolverine", date: "July 26, 2024", type: "movie", star: true, req: "xmen", reqText: "Finish Fox X-Men & Wolverine Saga First" },
+            { id: "mcu-76", num: "76", chronoRank: 67, title: "Agatha All Along", date: "September 18, 2024", type: "series", star: false },
+            { id: "mcu-77", num: "77", chronoRank: 67.5, title: "What If...? (Season 3)", date: "December 22, 2024", type: "animated", star: false },
+            { id: "mcu-78", num: "78", chronoRank: 68, title: "Your Friendly Neighborhood Spider-Man (Season 1)", date: "January 29, 2025", type: "animated", star: false },
+            { id: "mcu-79", num: "79", chronoRank: 69, title: "Captain America: Brave New World", date: "February 14, 2025", type: "movie", star: true },
+            { id: "mcu-80", num: "80", chronoRank: 70, title: "Daredevil: Born Again (Season 1)", date: "March 4, 2025", type: "series", star: true },
+            { id: "mcu-81", num: "81", chronoRank: 71, title: "Thunderbolts*", date: "May 2, 2025", type: "movie", star: true },
+            { id: "mcu-82", num: "82", chronoRank: 72, title: "Ironheart", date: "June 24, 2025", type: "series", star: false }
           ]
         },
         {
           phase: "Phase 6: The Multiverse Climax & Beyond (2025–2027+)",
           emoji: "🌟",
           items: [
-            { id: "mcu-83", num: "83", title: "The Fantastic Four: First Steps", date: "July 25, 2025", type: "movie", star: true },
-            { id: "mcu-84", num: "84", title: "Eyes of Wakanda", date: "August 6, 2025", type: "animated", star: false },
-            { id: "mcu-85", num: "85", title: "Marvel Zombies", date: "October 3, 2025", type: "animated", star: false },
-            { id: "mcu-86", num: "86", title: "Wonder Man", date: "December 2025", type: "series", star: false },
-            { id: "mcu-87", num: "87", title: "Spider-Man: Brand New Day (Spider-Man 4)", date: "July 24, 2026", type: "movie", star: true },
-            { id: "mcu-88", num: "88", title: "Avengers: Doomsday", date: "Dec 18, 2026", type: "movie", star: true },
-            { id: "mcu-89", num: "89", title: "Vision Quest", date: "Late 2026", type: "series", star: false },
-            { id: "mcu-90", num: "90", title: "Avengers: Secret Wars", date: "May 7, 2027", type: "movie", star: true, req: "xmen", reqText: "Culmination of all Multiverse Universes" }
+            { id: "mcu-83", num: "83", chronoRank: 73, title: "The Fantastic Four: First Steps", date: "July 25, 2025", type: "movie", star: true },
+            { id: "mcu-84", num: "84", chronoRank: 74, title: "Eyes of Wakanda", date: "August 6, 2025", type: "animated", star: false },
+            { id: "mcu-85", num: "85", chronoRank: 75, title: "Marvel Zombies", date: "October 3, 2025", type: "animated", star: false },
+            { id: "mcu-86", num: "86", chronoRank: 76, title: "Wonder Man", date: "December 2025", type: "series", star: false },
+            { id: "mcu-87", num: "87", chronoRank: 77, title: "Spider-Man: Brand New Day (Spider-Man 4)", date: "July 24, 2026", type: "movie", star: true },
+            { id: "mcu-88", num: "88", chronoRank: 78, title: "Avengers: Doomsday", date: "Dec 18, 2026", type: "movie", star: true },
+            { id: "mcu-89", num: "89", chronoRank: 79, title: "Vision Quest", date: "Late 2026", type: "series", star: false },
+            { id: "mcu-90", num: "90", chronoRank: 80, title: "Avengers: Secret Wars", date: "May 7, 2027", type: "movie", star: true, req: "xmen", reqText: "Culmination of all Multiverse Universes" }
           ]
         }
       ],
@@ -664,32 +754,32 @@
           phase: "Sam Raimi Trilogy (Earth-96283)",
           emoji: "🕸️",
           items: [
-            { id: "sm-01", num: "01", title: "Spider-Man", date: "May 3, 2002", type: "legacy", star: true },
-            { id: "sm-02", num: "02", title: "Spider-Man 2", date: "June 30, 2004", type: "legacy", star: true },
-            { id: "sm-03", num: "03", title: "Spider-Man 3", date: "May 4, 2007", type: "legacy", star: true }
+            { id: "sm-01", num: "01", chronoRank: 1, title: "Spider-Man", date: "May 3, 2002", type: "legacy", star: true },
+            { id: "sm-02", num: "02", chronoRank: 2, title: "Spider-Man 2", date: "June 30, 2004", type: "legacy", star: true },
+            { id: "sm-03", num: "03", chronoRank: 3, title: "Spider-Man 3", date: "May 4, 2007", type: "legacy", star: true }
           ]
         },
         {
           phase: "Marc Webb's Amazing Spider-Man (Earth-120703)",
           emoji: "⚡",
           items: [
-            { id: "sm-04", num: "04", title: "The Amazing Spider-Man", date: "July 3, 2012", type: "legacy", star: true },
-            { id: "sm-05", num: "05", title: "The Amazing Spider-Man 2", date: "May 2, 2014", type: "legacy", star: true }
+            { id: "sm-04", num: "04", chronoRank: 4, title: "The Amazing Spider-Man", date: "July 3, 2012", type: "legacy", star: true },
+            { id: "sm-05", num: "05", chronoRank: 5, title: "The Amazing Spider-Man 2", date: "May 2, 2014", type: "legacy", star: true }
           ]
         },
         {
           phase: "Sony's Spider-Man Universe (SSU) & Multiverse Animated",
           emoji: "🖤",
           items: [
-            { id: "sm-06", num: "06", title: "Venom", date: "October 5, 2018", type: "legacy", star: false },
-            { id: "sm-07", num: "07", title: "Spider-Man: Into the Spider-Verse", date: "December 14, 2018", type: "animated", star: true },
-            { id: "sm-08", num: "08", title: "Venom: Let There Be Carnage", date: "October 1, 2021", type: "legacy", star: false },
-            { id: "sm-09", num: "09", title: "Morbius", date: "April 1, 2022", type: "legacy", star: false },
-            { id: "sm-10", num: "10", title: "Spider-Man: Across the Spider-Verse", date: "June 2, 2023", type: "animated", star: true },
-            { id: "sm-11", num: "11", title: "Madame Web", date: "February 14, 2024", type: "legacy", star: false },
-            { id: "sm-12", num: "12", title: "Venom: The Last Dance", date: "October 25, 2024", type: "legacy", star: false },
-            { id: "sm-13", num: "13", title: "Kraven the Hunter", date: "December 13, 2024", type: "legacy", star: false },
-            { id: "sm-14", num: "14", title: "Spider-Man: Beyond the Spider-Verse", date: "Upcoming", type: "animated", star: true }
+            { id: "sm-06", num: "06", chronoRank: 6, title: "Venom", date: "October 5, 2018", type: "legacy", star: false },
+            { id: "sm-07", num: "07", chronoRank: 7, title: "Spider-Man: Into the Spider-Verse", date: "December 14, 2018", type: "animated", star: true },
+            { id: "sm-08", num: "08", chronoRank: 8, title: "Venom: Let There Be Carnage", date: "October 1, 2021", type: "legacy", star: false },
+            { id: "sm-09", num: "09", chronoRank: 9, title: "Morbius", date: "April 1, 2022", type: "legacy", star: false },
+            { id: "sm-10", num: "10", chronoRank: 10, title: "Spider-Man: Across the Spider-Verse", date: "June 2, 2023", type: "animated", star: true },
+            { id: "sm-11", num: "11", chronoRank: 11, title: "Madame Web", date: "February 14, 2024", type: "legacy", star: false },
+            { id: "sm-12", num: "12", chronoRank: 12, title: "Venom: The Last Dance", date: "October 25, 2024", type: "legacy", star: false },
+            { id: "sm-13", num: "13", chronoRank: 13, title: "Kraven the Hunter", date: "December 13, 2024", type: "legacy", star: false },
+            { id: "sm-14", num: "14", chronoRank: 14, title: "Spider-Man: Beyond the Spider-Verse", date: "Upcoming", type: "animated", star: true }
           ]
         }
       ],
@@ -699,45 +789,45 @@
           phase: "Original X-Men Trilogy",
           emoji: "🚪",
           items: [
-            { id: "xm-01", num: "01", title: "X-Men", date: "July 14, 2000", type: "legacy", star: true },
-            { id: "xm-02", num: "02", title: "X2: X-Men United", date: "May 2, 2003", type: "legacy", star: true },
-            { id: "xm-03", num: "03", title: "X-Men: The Last Stand", date: "May 26, 2006", type: "legacy", star: false }
+            { id: "xm-01", num: "01", chronoRank: 4, title: "X-Men", date: "July 14, 2000", type: "legacy", star: true },
+            { id: "xm-02", num: "02", chronoRank: 5, title: "X2: X-Men United", date: "May 2, 2003", type: "legacy", star: true },
+            { id: "xm-03", num: "03", chronoRank: 6, title: "X-Men: The Last Stand", date: "May 26, 2006", type: "legacy", star: false }
           ]
         },
         {
           phase: "Wolverine Solo Trilogy",
           emoji: "🐾",
           items: [
-            { id: "xm-04", num: "04", title: "X-Men Origins: Wolverine", date: "May 1, 2009", type: "legacy", star: false },
-            { id: "xm-05", num: "05", title: "The Wolverine", date: "July 26, 2013", type: "legacy", star: false },
-            { id: "xm-06", num: "06", title: "Logan", date: "March 3, 2017", type: "legacy", star: true }
+            { id: "xm-04", num: "04", chronoRank: 2, title: "X-Men Origins: Wolverine", date: "May 1, 2009", type: "legacy", star: false },
+            { id: "xm-05", num: "05", chronoRank: 7, title: "The Wolverine", date: "July 26, 2013", type: "legacy", star: false },
+            { id: "xm-06", num: "06", chronoRank: 12, title: "Logan", date: "March 3, 2017", type: "legacy", star: true }
           ]
         },
         {
           phase: "Prequel & Revised Timeline Series",
           emoji: "⏳",
           items: [
-            { id: "xm-07", num: "07", title: "X-Men: First Class", date: "June 3, 2011", type: "legacy", star: true },
-            { id: "xm-08", num: "08", title: "X-Men: Days of Future Past", date: "May 23, 2014", type: "legacy", star: true },
-            { id: "xm-09", num: "09", title: "X-Men: Apocalypse", date: "May 27, 2016", type: "legacy", star: false },
-            { id: "xm-10", num: "10", title: "Dark Phoenix", date: "June 7, 2019", type: "legacy", star: false },
-            { id: "xm-11", num: "11", title: "The New Mutants", date: "August 28, 2020", type: "legacy", star: false }
+            { id: "xm-07", num: "07", chronoRank: 1, title: "X-Men: First Class", date: "June 3, 2011", type: "legacy", star: true },
+            { id: "xm-08", num: "08", chronoRank: 3, title: "X-Men: Days of Future Past", date: "May 23, 2014", type: "legacy", star: true },
+            { id: "xm-09", num: "09", chronoRank: 3.2, title: "X-Men: Apocalypse", date: "May 27, 2016", type: "legacy", star: false },
+            { id: "xm-10", num: "10", chronoRank: 3.5, title: "Dark Phoenix", date: "June 7, 2019", type: "legacy", star: false },
+            { id: "xm-11", num: "11", chronoRank: 11, title: "The New Mutants", date: "August 28, 2020", type: "legacy", star: false }
           ]
         },
         {
           phase: "Deadpool Saga (Fox)",
           emoji: "⚔️",
           items: [
-            { id: "xm-12", num: "12", title: "Deadpool", date: "February 12, 2016", type: "legacy", star: true },
-            { id: "xm-13", num: "13", title: "Deadpool 2", date: "May 18, 2018", type: "legacy", star: true }
+            { id: "xm-12", num: "12", chronoRank: 8, title: "Deadpool", date: "February 12, 2016", type: "legacy", star: true },
+            { id: "xm-13", num: "13", chronoRank: 9, title: "Deadpool 2", date: "May 18, 2018", type: "legacy", star: true }
           ]
         },
         {
           phase: "Marvel Animation X-Men Arc",
           emoji: "📺",
           items: [
-            { id: "xm-14", num: "14", title: "X-Men: The Animated Series (Seasons 1-5)", date: "1992–1997", type: "animated", star: false },
-            { id: "xm-15", num: "15", title: "X-Men '97 (Season 1)", date: "March 20, 2024", type: "animated", star: true }
+            { id: "xm-14", num: "14", chronoRank: 9.5, title: "X-Men: The Animated Series (Seasons 1-5)", date: "1992–1997", type: "animated", star: false },
+            { id: "xm-15", num: "15", chronoRank: 10, title: "X-Men '97 (Season 1)", date: "March 20, 2024", type: "animated", star: true }
           ]
         }
       ]
@@ -745,6 +835,7 @@
 
     let activeUniverse = 'mcu';
     let currentFilter = 'all';
+    let orderMode = 'release'; // 'release' | 'chrono'
     let watchedItems = JSON.parse(localStorage.getItem('marvel_multiverse_watched_v2') || '{}');
 
     function getBadgeClass(type) {
@@ -773,14 +864,23 @@
       }
     }
 
-    function switchUniverse(universeKey, btn) {
+    function switchUniverse(universeKey) {
       activeUniverse = universeKey;
       currentFilter = 'all';
       
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      const activeBtn = document.getElementById(`tab-btn-${universeKey}`);
+      if (activeBtn) activeBtn.classList.add('active');
 
       renderFilterButtons();
+      renderList();
+      window.scrollTo({ top: 180, behavior: 'smooth' });
+    }
+
+    function setOrderMode(mode) {
+      orderMode = mode;
+      document.getElementById('order-release-btn').classList.toggle('active', mode === 'release');
+      document.getElementById('order-chrono-btn').classList.toggle('active', mode === 'chrono');
       renderList();
     }
 
@@ -824,9 +924,31 @@
       const query = document.getElementById('searchInput').value.toLowerCase().trim();
       const universeData = database[activeUniverse] || [];
 
-      let hasItems = false;
+      let sectionsToRender = [];
 
-      universeData.forEach(section => {
+      if (orderMode === 'chrono') {
+        let allItems = [];
+        universeData.forEach(section => {
+          allItems.push(...section.items);
+        });
+
+        allItems.sort((a, b) => (a.chronoRank || 999) - (b.chronoRank || 999));
+
+        sectionsToRender = [
+          {
+            phase: "Chronological In-Universe Storyline Order",
+            emoji: "⏳",
+            items: allItems
+          }
+        ];
+      } else {
+        sectionsToRender = universeData;
+      }
+
+      let hasItems = false;
+      let displayIndex = 1;
+
+      sectionsToRender.forEach(section => {
         const filteredItems = section.items.filter(item => {
           let matchesFilter = true;
           if (currentFilter === 'star') {
@@ -862,19 +984,21 @@
           card.className = `item-card ${isChecked ? 'watched' : ''}`;
           card.id = `card-${item.id}`;
 
-          // Requirement Tag
+          const itemNum = orderMode === 'chrono' ? String(displayIndex++).padStart(2, '0') : item.num;
+
+          // Prerequisite Interactive Deep Link Tag
           let reqHtml = '';
-          if (item.req === 'spider') {
-            reqHtml = `<span class="req-tag req-spider">🕷️ ${item.reqText}</span>`;
+          if (item.req === 'spiderman') {
+            reqHtml = `<span class="req-tag req-spider" onclick="switchUniverse('spiderman')" title="Click to open Spider-Man Universe">🕷️ ${item.reqText}</span>`;
           } else if (item.req === 'xmen') {
-            reqHtml = `<span class="req-tag req-xmen">🧬 ${item.reqText}</span>`;
+            reqHtml = `<span class="req-tag req-xmen" onclick="switchUniverse('xmen')" title="Click to open X-Men Universe">🧬 ${item.reqText}</span>`;
           }
 
           card.innerHTML = `
             <div class="item-left">
               <input type="checkbox" class="item-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleWatched('${item.id}')" />
               ${item.star ? '<span class="star-icon" title="Essential Main-Arc Title">⭐</span>' : '<span class="star-placeholder"></span>'}
-              <span class="item-number">${item.num}.</span>
+              <span class="item-number">${itemNum}.</span>
               <div class="item-title-wrapper">
                 <span class="item-title">${item.title}</span>
                 ${reqHtml}
@@ -943,6 +1067,34 @@
 
     function filterItems() {
       renderList();
+    }
+
+    /* Backup Export / Import */
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(watchedItems, null, 2));
+      const dlAnchorElem = document.createElement('a');
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", "mcu_watchlist_backup.json");
+      dlAnchorElem.click();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          watchedItems = imported;
+          localStorage.setItem('marvel_multiverse_watched_v2', JSON.stringify(watchedItems));
+          renderList();
+          alert('Watchlist progress successfully imported!');
+        } catch (err) {
+          alert('Invalid backup JSON file.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     // Init
