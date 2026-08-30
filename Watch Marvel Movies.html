@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marvel Cinematic Universe — Complete Master Watchlist</title>
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --card-bg: rgba(22, 27, 34, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(229, 9, 20, 0.4);
+      --marvel-red: #e62429;
+      --marvel-gold: #f5a623;
+      --accent-blue: #00d2ff;
+      --accent-purple: #9d4edd;
+      --accent-green: #06d6a0;
+      --accent-orange: #ff7b00;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --tag-movie: #e62429;
+      --tag-series: #0077b6;
+      --tag-special: #7b2cbf;
+      --tag-animated: #e09f3e;
+      --tag-oneshot: #38b000;
+      --tag-tv: #028090;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 2rem 1rem 5rem;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(230, 36, 41, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .marvel-badge {
+      display: inline-block;
+      background: var(--marvel-red);
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: 2px;
+      padding: 4px 12px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--marvel-gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Notes Box */
+    .note-card {
+      background: linear-gradient(135deg, rgba(245, 166, 35, 0.1) 0%, rgba(230, 36, 41, 0.05) 100%);
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      border-left: 4px solid var(--marvel-gold);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .note-card h3 {
+      color: var(--marvel-gold);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .note-card p {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      margin-bottom: 0.35rem;
+    }
+
+    .note-card code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    /* Stats & Progress Tracker */
+    .tracker-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .tracker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--marvel-red), var(--marvel-gold));
+      transition: width 0.3s ease;
+    }
+
+    /* Controls Bar */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .search-box {
+      flex: 1 1 280px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--marvel-red);
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(230, 36, 41, 0.15);
+      color: #fff;
+      border-color: var(--marvel-red);
+    }
+
+    /* Phase Sections */
+    .phase-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .phase-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .phase-title span.emoji {
+      font-size: 1.25rem;
+    }
+
+    /* Item Card Grid */
+    .items-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+      user-select: none;
+    }
+
+    .item-card:hover {
+      border-color: var(--card-hover-border);
+      transform: translateY(-1px);
+      background: rgba(30, 37, 46, 0.85);
+    }
+
+    .item-card.watched {
+      opacity: 0.55;
+      background: rgba(15, 20, 25, 0.4);
+    }
+
+    .item-card.watched .item-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .item-checkbox {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--text-muted);
+      border-radius: 5px;
+      cursor: pointer;
+      position: relative;
+      background: transparent;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .item-checkbox:checked {
+      background: var(--marvel-red);
+      border-color: var(--marvel-red);
+    }
+
+    .item-checkbox:checked::after {
+      content: "✓";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .item-number {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 28px;
+    }
+
+    .item-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      margin-right: 8px;
+    }
+
+    .item-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .item-date {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Badges */
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .badge-movie { background: rgba(230, 36, 41, 0.2); color: #ff6b6b; border: 1px solid rgba(230, 36, 41, 0.4); }
+    .badge-series { background: rgba(0, 119, 182, 0.2); color: #48cae4; border: 1px solid rgba(0, 119, 182, 0.4); }
+    .badge-special { background: rgba(123, 44, 191, 0.2); color: #c77dff; border: 1px solid rgba(123, 44, 191, 0.4); }
+    .badge-animated { background: rgba(224, 159, 62, 0.2); color: #ffd166; border: 1px solid rgba(224, 159, 62, 0.4); }
+    .badge-oneshot { background: rgba(56, 176, 0, 0.2); color: #70e000; border: 1px solid rgba(56, 176, 0, 0.4); }
+    .badge-tv { background: rgba(2, 128, 144, 0.2); color: #52b788; border: 1px solid rgba(2, 128, 144, 0.4); }
+
+    /* Responsive */
+    @media (max-width: 650px) {
+      .item-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .item-right {
+        width: 100%;
+        justify-content: space-between;
+        padding-left: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <header>
+      <div class="marvel-badge">Marvel Cinematic Universe</div>
+      <h1>Ultimate Master Watchlist</h1>
+      <p class="subtitle">Complete timeline including Movies, Disney+ Series, Marvel Television, Special Presentations, One-Shots, and Marvel Animation.</p>
+    </header>
+
+    <div class="note-card">
+      <h3>📌 Watcher's Notes & Media Settings</h3>
+      <p>• <strong>VLC Audio Tip:</strong> When watching <em>Loki (Season 1)</em> starting from <strong>Episode 4</strong> onward up through <em>Shang-Chi and the Legend of the Ten Rings</em> (excluding <em>Spider-Man: Far From Home</em>), open <strong>VLC Media Player &gt; Audio &gt; Audio Track</strong> and select <strong>English (Original Audio)</strong> to avoid default dub tracks.</p>
+      <p>• <strong>Timeline Notice:</strong> Upcoming Phase 6 titles and dates are organized based on the latest Marvel Studios production calendars and are subject to official scheduling changes.</p>
+    </div>
+
+    <div class="tracker-panel">
+      <div class="tracker-header">
+        <span>Watch Progress</span>
+        <span id="tracker-count">0 / 0 Completed (0%)</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search Marvel title, phase, or year..." oninput="filterItems()" />
+      </div>
+      <div class="filter-buttons">
+        <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn" onclick="setFilter('movie', this)">Movies</button>
+        <button class="filter-btn" onclick="setFilter('series', this)">Disney+ Series</button>
+        <button class="filter-btn" onclick="setFilter('special', this)">Specials</button>
+        <button class="filter-btn" onclick="setFilter('animated', this)">Animation</button>
+        <button class="filter-btn" onclick="setFilter('oneshot', this)">One-Shots</button>
+        <button class="filter-btn" onclick="setFilter('tv', this)">Marvel TV</button>
+      </div>
+    </div>
+
+    <main id="watchlist-content"></main>
+
+  </div>
+
+  <script>
+    const mcuData = [
+      {
+        phase: "Phase 1: The Infinity Saga Begins (2008–2012)",
+        emoji: "🌀",
+        items: [
+          { num: "01", title: "Iron Man", date: "May 2, 2008", type: "movie" },
+          { num: "02", title: "The Incredible Hulk", date: "June 13, 2008", type: "movie" },
+          { num: "03", title: "Iron Man 2", date: "May 7, 2010", type: "movie" },
+          { num: "04", title: "Thor", date: "May 6, 2011", type: "movie" },
+          { num: "05", title: "Captain America: The First Avenger", date: "July 22, 2011", type: "movie" },
+          { num: "06", title: "Marvel One-Shot: The Consultant", date: "September 13, 2011", type: "oneshot" },
+          { num: "07", title: "Marvel One-Shot: A Funny Thing Happened...", date: "October 25, 2011", type: "oneshot" },
+          { num: "08", title: "The Avengers", date: "May 4, 2012", type: "movie" },
+          { num: "09", title: "Marvel One-Shot: Item 47", date: "September 25, 2012", type: "oneshot" }
+        ]
+      },
+      {
+        phase: "Phase 2: Expanding the Universe (2013–2015)",
+        emoji: "⚙️",
+        items: [
+          { num: "10", title: "Iron Man 3", date: "May 3, 2013", type: "movie" },
+          { num: "11", title: "Marvel One-Shot: Agent Carter", date: "September 3, 2013", type: "oneshot" },
+          { num: "12", title: "Agents of S.H.I.E.L.D. (Season 1)", date: "September 24, 2013", type: "tv" },
+          { num: "13", title: "Thor: The Dark World", date: "November 8, 2013", type: "movie" },
+          { num: "14", title: "Marvel One-Shot: All Hail the King", date: "February 4, 2014", type: "oneshot" },
+          { num: "15", title: "Captain America: The Winter Soldier", date: "April 4, 2014", type: "movie" },
+          { num: "16", title: "Guardians of the Galaxy", date: "August 1, 2014", type: "movie" },
+          { num: "17", title: "Agents of S.H.I.E.L.D. (Season 2)", date: "September 23, 2014", type: "tv" },
+          { num: "18", title: "Agent Carter (Season 1)", date: "January 6, 2015", type: "tv" },
+          { num: "19", title: "Daredevil (Season 1)", date: "April 10, 2015", type: "tv" },
+          { num: "20", title: "Avengers: Age of Ultron", date: "May 1, 2015", type: "movie" },
+          { num: "21", title: "WHIH Newsfront (Season 1)", date: "July 2, 2015", type: "tv" },
+          { num: "22", title: "Ant-Man", date: "July 17, 2015", type: "movie" }
+        ]
+      },
+      {
+        phase: "Phase 3: The Infinity Climax & Netflix Era (2015–2019)",
+        emoji: "💥",
+        items: [
+          { num: "23", title: "Agents of S.H.I.E.L.D. (Season 3)", date: "September 29, 2015", type: "tv" },
+          { num: "24", title: "Jessica Jones (Season 1)", date: "November 20, 2015", type: "tv" },
+          { num: "25", title: "Agent Carter (Season 2)", date: "January 19, 2016", type: "tv" },
+          { num: "26", title: "Daredevil (Season 2)", date: "March 18, 2016", type: "tv" },
+          { num: "27", title: "Captain America: Civil War", date: "May 6, 2016", type: "movie" },
+          { num: "28", title: "Agents of S.H.I.E.L.D. (Season 4)", date: "September 20, 2016", type: "tv" },
+          { num: "29", title: "Luke Cage (Season 1)", date: "September 30, 2016", type: "tv" },
+          { num: "30", title: "Doctor Strange", date: "November 4, 2016", type: "movie" },
+          { num: "31", title: "Agents of S.H.I.E.L.D.: Slingshot", date: "December 13, 2016", type: "tv" },
+          { num: "32", title: "Iron Fist (Season 1)", date: "March 17, 2017", type: "tv" },
+          { num: "33", title: "Guardians of the Galaxy Vol. 2", date: "May 5, 2017", type: "movie" },
+          { num: "34", title: "Spider-Man: Homecoming", date: "July 7, 2017", type: "movie" },
+          { num: "35", title: "The Defenders (Limited Series)", date: "August 18, 2017", type: "tv" },
+          { num: "36", title: "Inhumans (Season 1)", date: "September 29, 2017", type: "tv" },
+          { num: "37", title: "Thor: Ragnarok", date: "November 3, 2017", type: "movie" },
+          { num: "38", title: "The Punisher (Season 1)", date: "November 17, 2017", type: "tv" },
+          { num: "39", title: "Runaways (Season 1)", date: "November 21, 2017", type: "tv" },
+          { num: "40", title: "Agents of S.H.I.E.L.D. (Season 5)", date: "December 1, 2017", type: "tv" },
+          { num: "41", title: "Black Panther", date: "February 16, 2018", type: "movie" },
+          { num: "42", title: "Jessica Jones (Season 2)", date: "March 8, 2018", type: "tv" },
+          { num: "43", title: "Avengers: Infinity War", date: "April 27, 2018", type: "movie" },
+          { num: "44", title: "Cloak & Dagger (Season 1)", date: "June 7, 2018", type: "tv" },
+          { num: "45", title: "Luke Cage (Season 2)", date: "June 22, 2018", type: "tv" },
+          { num: "46", title: "Ant-Man and the Wasp", date: "July 6, 2018", type: "movie" },
+          { num: "47", title: "Iron Fist (Season 2)", date: "September 7, 2018", type: "tv" },
+          { num: "48", title: "Daredevil (Season 3)", date: "October 19, 2018", type: "tv" },
+          { num: "49", title: "Runaways (Season 2)", date: "December 21, 2018", type: "tv" },
+          { num: "50", title: "The Punisher (Season 2)", date: "January 18, 2019", type: "tv" },
+          { num: "51", title: "Captain Marvel", date: "March 8, 2019", type: "movie" },
+          { num: "52", title: "Cloak & Dagger (Season 2)", date: "April 4, 2019", type: "tv" },
+          { num: "53", title: "Avengers: Endgame", date: "April 26, 2019", type: "movie" },
+          { num: "54", title: "Agents of S.H.I.E.L.D. (Season 6)", date: "May 10, 2019", type: "tv" },
+          { num: "55", title: "Jessica Jones (Season 3)", date: "June 14, 2019", type: "tv" },
+          { num: "56", title: "Spider-Man: Far From Home", date: "July 2, 2019", type: "movie" },
+          { num: "57", title: "Runaways (Season 3)", date: "December 13, 2019", type: "tv" },
+          { num: "58", title: "Agents of S.H.I.E.L.D. (Season 7)", date: "May 27, 2020", type: "tv" },
+          { num: "59", title: "Helstrom (Season 1)", date: "October 16, 2020", type: "tv" }
+        ]
+      },
+      {
+        phase: "Phase 4: The Multiverse Saga Begins (2021–2022)",
+        emoji: "🌌",
+        items: [
+          { num: "60", title: "WandaVision", date: "January 15, 2021", type: "series" },
+          { num: "61", title: "The Falcon and the Winter Soldier", date: "March 19, 2021", type: "series" },
+          { num: "62", title: "Loki (Season 1)", date: "June 9, 2021", type: "series" },
+          { num: "63", title: "Black Widow", date: "July 9, 2021", type: "movie" },
+          { num: "64", title: "What If...? (Season 1)", date: "August 11, 2021", type: "animated" },
+          { num: "65", title: "Shang-Chi and the Legend of the Ten Rings", date: "September 3, 2021", type: "movie" },
+          { num: "66", title: "Eternals", date: "November 5, 2021", type: "movie" },
+          { num: "67", title: "Hawkeye", date: "November 24, 2021", type: "series" },
+          { num: "68", title: "Spider-Man: No Way Home", date: "December 17, 2021", type: "movie" },
+          { num: "69", title: "Moon Knight", date: "March 30, 2022", type: "series" },
+          { num: "70", title: "Doctor Strange in the Multiverse of Madness", date: "May 6, 2022", type: "movie" },
+          { num: "71", title: "Ms. Marvel", date: "June 8, 2022", type: "series" },
+          { num: "72", title: "Thor: Love and Thunder", date: "July 8, 2022", type: "movie" },
+          { num: "73", title: "I Am Groot (Season 1)", date: "August 10, 2022", type: "animated" },
+          { num: "74", title: "She-Hulk: Attorney at Law", date: "August 18, 2022", type: "series" },
+          { num: "75", title: "Werewolf by Night", date: "October 7, 2022", type: "special" },
+          { num: "76", title: "Black Panther: Wakanda Forever", date: "November 11, 2022", type: "movie" },
+          { num: "77", title: "The Guardians of the Galaxy Holiday Special", date: "November 25, 2022", type: "special" }
+        ]
+      },
+      {
+        phase: "Phase 5: The Multiverse Deepens (2023–2025)",
+        emoji: "🚀",
+        items: [
+          { num: "78", title: "Ant-Man and the Wasp: Quantumania", date: "February 17, 2023", type: "movie" },
+          { num: "79", title: "Guardians of the Galaxy Vol. 3", date: "May 5, 2023", type: "movie" },
+          { num: "80", title: "Secret Invasion", date: "June 21, 2023", type: "series" },
+          { num: "81", title: "I Am Groot (Season 2)", date: "September 6, 2023", type: "animated" },
+          { num: "82", title: "Loki (Season 2)", date: "October 5, 2023", type: "series" },
+          { num: "83", title: "The Marvels", date: "November 10, 2023", type: "movie" },
+          { num: "84", title: "What If...? (Season 2)", date: "December 22, 2023", type: "animated" },
+          { num: "85", title: "Echo", date: "January 9, 2024", type: "series" },
+          { num: "86", title: "X-Men '97 (Season 1)", date: "March 20, 2024", type: "animated" },
+          { num: "87", title: "Deadpool & Wolverine", date: "July 26, 2024", type: "movie" },
+          { num: "88", title: "Agatha All Along", date: "September 18, 2024", type: "series" },
+          { num: "89", title: "What If...? (Season 3)", date: "December 22, 2024", type: "animated" },
+          { num: "90", title: "Your Friendly Neighborhood Spider-Man (Season 1)", date: "January 29, 2025", type: "animated" },
+          { num: "91", title: "Captain America: Brave New World", date: "February 14, 2025", type: "movie" },
+          { num: "92", title: "Daredevil: Born Again (Season 1)", date: "March 4, 2025", type: "series" },
+          { num: "93", title: "Thunderbolts*", date: "May 2, 2025", type: "movie" },
+          { num: "94", title: "Ironheart", date: "June 24, 2025", type: "series" }
+        ]
+      },
+      {
+        phase: "Phase 6: Secret Wars & Beyond (2025–2027+)",
+        emoji: "🌟",
+        items: [
+          { num: "95", title: "The Fantastic Four: First Steps", date: "July 25, 2025", type: "movie" },
+          { num: "96", title: "Eyes of Wakanda", date: "August 6, 2025", type: "animated" },
+          { num: "97", title: "Marvel Zombies", date: "October 3, 2025", type: "animated" },
+          { num: "98", title: "Wonder Man", date: "December 2025", type: "series" },
+          { num: "99", title: "Daredevil: Born Again (Season 2)", date: "Early 2026", type: "series" },
+          { num: "100", title: "Avengers: Doomsday", date: "May 1, 2026", type: "movie" },
+          { num: "101", title: "Spider-Man: Brand New Day (Spider-Man 4)", date: "July 24, 2026", type: "movie" },
+          { num: "102", title: "Vision Quest", date: "Late 2026", type: "series" },
+          { num: "103", title: "Your Friendly Neighborhood Spider-Man (Season 2)", date: "2026", type: "animated" },
+          { num: "104", title: "Untitled Punisher Special", date: "2026", type: "special" },
+          { num: "105", title: "Avengers: Secret Wars", date: "May 7, 2027", type: "movie" }
+        ]
+      }
+    ];
+
+    let currentFilter = 'all';
+    let watchedItems = JSON.parse(localStorage.getItem('mcu_watched_v1') || '{}');
+
+    function getBadgeClass(type) {
+      switch(type) {
+        case 'movie': return 'badge-movie';
+        case 'series': return 'badge-series';
+        case 'special': return 'badge-special';
+        case 'animated': return 'badge-animated';
+        case 'oneshot': return 'badge-oneshot';
+        case 'tv': return 'badge-tv';
+        default: return 'badge-movie';
+      }
+    }
+
+    function getTypeName(type) {
+      switch(type) {
+        case 'movie': return 'Movie';
+        case 'series': return 'Disney+ Series';
+        case 'special': return 'Special';
+        case 'animated': return 'Animation';
+        case 'oneshot': return 'One-Shot';
+        case 'tv': return 'Marvel TV';
+        default: return type;
+      }
+    }
+
+    function renderList() {
+      const container = document.getElementById('watchlist-content');
+      container.innerHTML = '';
+
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      mcuData.forEach(phaseData => {
+        const filteredItems = phaseData.items.filter(item => {
+          const matchesFilter = (currentFilter === 'all' || item.type === currentFilter);
+          const matchesSearch = item.title.toLowerCase().includes(query) || 
+                                item.date.toLowerCase().includes(query) ||
+                                phaseData.phase.toLowerCase().includes(query);
+          return matchesFilter && matchesSearch;
+        });
+
+        if (filteredItems.length === 0) return;
+
+        const phaseSection = document.createElement('section');
+        phaseSection.className = 'phase-section';
+
+        const phaseHeading = document.createElement('h2');
+        phaseHeading.className = 'phase-title';
+        phaseHeading.innerHTML = `<span class="emoji">${phaseData.emoji}</span> ${phaseData.phase}`;
+        phaseSection.appendChild(phaseHeading);
+
+        const grid = document.createElement('div');
+        grid.className = 'items-grid';
+
+        filteredItems.forEach(item => {
+          const isChecked = watchedItems[item.num] || false;
+          const card = document.createElement('div');
+          card.className = `item-card ${isChecked ? 'watched' : ''}`;
+          card.id = `card-${item.num}`;
+
+          card.innerHTML = `
+            <div class="item-left">
+              <input type="checkbox" class="item-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleWatched('${item.num}')" />
+              <span class="item-number">${item.num}.</span>
+              <span class="item-title">${item.title}</span>
+            </div>
+            <div class="item-right">
+              <span class="item-date">${item.date}</span>
+              <span class="badge ${getBadgeClass(item.type)}">${getTypeName(item.type)}</span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        phaseSection.appendChild(grid);
+        container.appendChild(phaseSection);
+      });
+
+      updateTracker();
+    }
+
+    function toggleWatched(num) {
+      watchedItems[num] = !watchedItems[num];
+      localStorage.setItem('mcu_watched_v1', JSON.stringify(watchedItems));
+      
+      const card = document.getElementById(`card-${num}`);
+      if (card) {
+        if (watchedItems[num]) {
+          card.classList.add('watched');
+        } else {
+          card.classList.remove('watched');
+        }
+      }
+      updateTracker();
+    }
+
+    function updateTracker() {
+      let total = 0;
+      let watched = 0;
+
+      mcuData.forEach(p => {
+        p.items.forEach(item => {
+          total++;
+          if (watchedItems[item.num]) watched++;
+        });
+      });
+
+      const percent = total > 0 ? Math.round((watched / total) * 100) : 0;
+      document.getElementById('tracker-count').innerText = `${watched} / ${total} Completed (${percent}%)`;
+      document.getElementById('progress-fill').style.width = `${percent}%`;
+    }
+
+    function setFilter(type, btn) {
+      currentFilter = type;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList();
+    }
+
+    function filterItems() {
+      renderList();
+    }
+
+    // Initialize list on page load
+    renderList();
+  </script>
+</body>
+</html>
